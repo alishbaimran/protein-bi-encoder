@@ -26,6 +26,7 @@ from tensor import collate_tensors, numpy_seed
 from typed import PathLike
 from align import MSA
 from tokenization import Vocab
+import re
 
 T = TypeVar("T")
 
@@ -340,7 +341,8 @@ class FastaDataset(SizedDataset):
         else:
             data = self.file.read(self.offsets[idx + 1] - self.offsets[idx])
         desc, *seq = data.split("\n")
-        return desc[1:], "".join(seq)
+        filtered_desc = self.filter_description(desc[1:])
+        return filtered_desc, "".join(seq)
 
     def __len__(self):
         return self.offsets.size
@@ -362,7 +364,15 @@ class FastaDataset(SizedDataset):
         bytes_np = np.fromstring(bytes_offsets, dtype=np.int64, sep=" ")
         sizes_np = np.fromstring(fasta_lengths, dtype=np.int64, sep=" ")
         return bytes_np, sizes_np
-
+    
+    def filter_description(self, description: str) -> str:
+        cluster_name_match = re.search(r"\s(.+?)\sn=", description)
+        tax_match = re.search(r"Tax=([\w\s\-]+)\s", description)  
+        
+        cluster_name = cluster_name_match.group(1).strip() if cluster_name_match else "Unknown"
+        tax = tax_match.group(1).strip() if tax_match else "Unknown"
+        
+        return f"name={cluster_name} tax={tax}"
 
 class EncodedFastaDataset(CollatableVocabDataset, FastaDataset):
     def __init__(self, data_file: PathLike, vocab: Vocab):

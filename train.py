@@ -103,16 +103,6 @@ for epoch in range(num_epochs):
                 pbar.set_postfix({'loss': val_loss / pbar.n, 'accuracy': val_acc / pbar.n})
     
     avg_val_loss = val_loss / len(val_loader)
-    avg_val_acc = val_acc / len(val_loader)
-    print(f"Epoch: {epoch+1}, Validation Loss: {avg_val_loss}, Validation Accuracy: {avg_val_acc}")
-
-    # log to wandb
-    wandb.log({
-       "epoch": epoch,
-       "train_loss": avg_train_loss,
-       "train_accuracy": avg_train_acc,
-       "val_loss": avg_val_loss,
-       "val_accuracy": avg_val_acc,
-     }, step=epoch)
+    print(f"Epoch: {epoch}, Validation Loss: {avg_val_loss}")
 
 wandb.finish()
