@@ -20,14 +20,14 @@ class BiEncoder(nn.Module):
         special_tokens = ["name=", "tax="]
         self.tokenizer.add_tokens(special_tokens)
         
-        self.tokenizer.post_processor = processors.TemplateProcessing(
-            single="[CLS] $A [SEP]",
-            pair="[CLS] $A [SEP] $B:1 [SEP]:1",
-            special_tokens=[
-                ("[CLS]", self.tokenizer.token_to_id("[CLS]")),
-                ("[SEP]", self.tokenizer.token_to_id("[SEP]")),
-            ],
-        )
+        # self.tokenizer.post_processor = processors.TemplateProcessing(
+        #     single="[CLS] $A [SEP]",
+        #     pair="[CLS] $A [SEP] $B:1 [SEP]:1",
+        #     special_tokens=[
+        #         ("[CLS]", self.tokenizer.token_to_id("[CLS]")),
+        #         ("[SEP]", self.tokenizer.token_to_id("[SEP]")),
+        #     ],
+        # )
 
         self.tokenizer.enable_padding(pad_id=self.tokenizer.token_to_id("[PAD]"), pad_token="[PAD]")
 
