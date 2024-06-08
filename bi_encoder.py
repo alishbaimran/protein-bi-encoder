@@ -16,14 +16,19 @@ class BiEncoder(nn.Module):
         
         self.passage_encoder = BertModel.from_pretrained(bert_model_name)
         self.tokenizer = Tokenizer.from_file(tokenizer_path)
-        self.tokenizer.post_processor = processors.TemplateProcessing(
-            single="[CLS] $A [SEP]",
-            pair="[CLS] $A [SEP] $B:1 [SEP]:1",
-            special_tokens=[
-                ("[CLS]", self.tokenizer.token_to_id("[CLS]")),
-                ("[SEP]", self.tokenizer.token_to_id("[SEP]")),
-            ],
-        )
+
+        special_tokens = ["name=", "tax="]
+        self.tokenizer.add_tokens(special_tokens)
+        
+        # self.tokenizer.post_processor = processors.TemplateProcessing(
+        #     single="[CLS] $A [SEP]",
+        #     pair="[CLS] $A [SEP] $B:1 [SEP]:1",
+        #     special_tokens=[
+        #         ("[CLS]", self.tokenizer.token_to_id("[CLS]")),
+        #         ("[SEP]", self.tokenizer.token_to_id("[SEP]")),
+        #     ],
+        # )
+
         self.tokenizer.enable_padding(pad_id=self.tokenizer.token_to_id("[PAD]"), pad_token="[PAD]")
 
         # linear layer to project protein embeddings to the same dimension as BERT embeddings 
@@ -83,10 +88,10 @@ class BiEncoder(nn.Module):
         inputs = {'input_ids': input_ids, 'attention_mask': attention_mask}
 
         # debug: print original descriptions and their tokenized versions
-        #for i, desc in enumerate(descriptions[:3]):  # Print the first 3 descriptions for debugging
-            #print(f"Original description {i}: {desc}")
-            #tokens = encoding[i].tokens
-            #print(f"Tokenized description {i}: {tokens}")
+        # for i, desc in enumerate(descriptions[:3]): 
+        #     print(f"Original description {i}: {desc}")
+        #     tokens = encoding[i].tokens
+        #     print(f"Tokenized description {i}: {tokens}")
 
         # attention pool, embeddings of CLS for each sequence in batch
         description_embeddings = self.passage_encoder(**inputs).last_hidden_state[:, 0, :]
