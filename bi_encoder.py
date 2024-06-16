@@ -17,8 +17,8 @@ class BiEncoder(nn.Module):
         self.passage_encoder = BertModel.from_pretrained(bert_model_name)
         self.tokenizer = Tokenizer.from_file(tokenizer_path)
 
-        special_tokens = ["name=", "tax="]
-        self.tokenizer.add_tokens(special_tokens)
+        # special_tokens = ["name=", "tax="]
+        # self.tokenizer.add_tokens(special_tokens)
         
         # self.tokenizer.post_processor = processors.TemplateProcessing(
         #     single="[CLS] $A [SEP]",
@@ -29,7 +29,7 @@ class BiEncoder(nn.Module):
         #     ],
         # )
 
-        self.tokenizer.enable_padding(pad_id=self.tokenizer.token_to_id("[PAD]"), pad_token="[PAD]")
+        # self.tokenizer.enable_padding(pad_id=self.tokenizer.token_to_id("[PAD]"), pad_token="[PAD]")
 
         # linear layer to project protein embeddings to the same dimension as BERT embeddings 
         self.projection = nn.Linear(1280, 768)
