@@ -63,15 +63,29 @@ def main(rank, world_size):
 
     # contrastive loss function and accuracy calculation
     def contrastive_loss(queries, keys, temperature=0.1):
+        # Get the batch size and the device of the queries tensor
         b, device = queries.shape[0], queries.device
+
+        # Calculate the dot product between queries and the transpose of keys
         logits = queries @ keys.t()
+        
+        # Normalize logits
         logits = logits - logits.max(dim=-1, keepdim=True).values
+        
+        # Scale logits by temperature
         logits /= temperature
+
+        # contrastive loss computed using cross-entropy
         loss = F.cross_entropy(logits, torch.arange(b, device=device))
 
         # calculate accuracy
+        # Get the predicted positive indices (predicted class for each query)
         pred_positive_idx = torch.argmax(logits, dim=1)
+
+        # Determine which predictions are correct
         correct = torch.eq(pred_positive_idx, torch.arange(b, device=device)).type(torch.float)
+
+        # Calculate accuracy (proportion of correct predictions)
         acc = correct.sum() / b
 
         return loss, acc
